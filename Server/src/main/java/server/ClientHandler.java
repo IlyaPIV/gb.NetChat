@@ -1,6 +1,6 @@
 package server;
 
-import constants.*;
+import constants.Command;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -44,7 +44,7 @@ public class ClientHandler {
                                 break;
                             }
 
-                            if (str.startsWith(Command.AUTH)) {
+                            if (str.startsWith(Command.AUTH+" ")) {
                                 String[] token = str.split(" ",3);
                                 if (token.length < 3) {
                                     continue;

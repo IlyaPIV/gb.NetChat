@@ -5,6 +5,7 @@ import constants.Command;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -13,6 +14,9 @@ public class Server {
     private  ServerSocket serverSocket;
     private  Socket clientSocket;
     private  final int PORT = 8189;
+
+//    private static DataInputStream in;
+//    private static DataOutputStream out;
 
     private List<ClientHandler> clients;
 
