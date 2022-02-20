@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.Controller">
+    <padding>
+        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+    </padding>
+    <stylesheets>
+<!--        <URL value = "@/css/style.css"/>-->
+
+    </stylesheets>
+   <HBox fx:id="AuthPanel">
+       <children>
+           <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Login"/>
+           <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="password"/>
+           <Button text="Auth" alignment="CENTER_RIGHT" onAction="#tryToAuth"/>
+       </children>
+   </HBox>
+
+
+    <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS">
+      <font>
+         <Font size="14.0" />
+      </font></TextArea>
+   <HBox fx:id="MsgPanel" visible="false" managed="false">
+      <children>
+          <TextField fx:id="textField" onAction="#sendMessage" promptText="write your message here..." HBox.hgrow="ALWAYS" />
+         <Button alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#sendMessage" text="Send message..." />
+      </children>
+   </HBox>
+</VBox>
