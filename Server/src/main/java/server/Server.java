@@ -60,6 +60,22 @@ public class Server {
         }
     }
 
+    public void broadcastClientList() {
+        StringBuilder sb = new StringBuilder("/clientlist");
+
+        for (ClientHandler ch:
+             clients) {
+            sb.append(" ").append(ch.getNickname());
+        }
+
+        String msg = sb.toString();
+
+        for (ClientHandler ch:
+                clients) {
+            ch.sendMsg(msg);
+        }
+    }
+
     public void privateMsg(ClientHandler sender, String getterNickname, String msg){
         ClientHandler getter = findGetter(getterNickname);
         if (getter==null) {
@@ -82,19 +98,32 @@ public class Server {
         return null;
     }
 
+
+    public boolean isLoginUsed(String login){
+        for (ClientHandler ch:
+             clients) {
+            if (ch.getLogin().equals(login)) return true;
+        }
+        return false;
+    }
+
     public void subscribe(ClientHandler ch) {
         String message = String.format(">>> user [%s] now is online...",ch.getNickname());
         broadcastMsg(ch,message, true);
         clients.add(ch);
+        broadcastClientList();
     }
 
     public void unsubscribe(ClientHandler ch) {
         clients.remove(ch);
         String message = String.format(">>> user [%s] left our chat...",ch.getNickname());
         broadcastMsg(ch,message, true);
+        broadcastClientList();
     }
 
     public AuthService getAuthService(){
         return authService;
     }
+
+
 }

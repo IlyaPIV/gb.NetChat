@@ -1,9 +1,13 @@
 package server;
 
+import constants.Command;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
     private Server server;
@@ -13,6 +17,7 @@ public class ClientHandler {
 
     private boolean authenticated;
     private String nickname;
+    private String login;
 
     public ClientHandler(Server server, Socket socket) {
 
@@ -27,12 +32,15 @@ public class ClientHandler {
             new Thread(()->{
                 try {
 
+                    //ДЗ
+                    socket.setSoTimeout(120000);
+
                     //цикл аутентификации
                     while (true) {
                         String str = in.readUTF();
 
                         if (str.startsWith("/")) {
-                            if (str.equals("/end")) {
+                            if (str.equals(Command.END)) {
                                 sendMsg("/end");
                                 break;
                             }
@@ -43,19 +51,37 @@ public class ClientHandler {
                                     continue;
                                 }
                                 String newNick = server.getAuthService().getNicknameByLoginAndPassword(token[1],token[2]);
-
+                                login = token[1];
                                 if (newNick != null) {
-                                    nickname = newNick;
-                                    sendMsg("/auth_OK " + nickname);
-                                    authenticated = true;
-                                    server.subscribe(this);
-                                    break;
+                                    if (!server.isLoginUsed(login)) {
+                                        nickname = newNick;
+                                        sendMsg("/auth_OK " + nickname);
+                                        authenticated = true;
+                                        server.subscribe(this);
+                                        break;
+                                    } else {
+                                        sendMsg("Эта учётная запись уже используется.");
+                                    }
                                 } else {
                                     sendMsg("Логин / пароль не верны");
                                 }
                             }
+
+                            if (str.startsWith("/reg")) {
+                                String[] token = str.split(" ");
+                                if (token.length<4) {
+                                    continue;
+                                }
+                                if (server.getAuthService().registration(token[1],token[2],token[3])){
+                                    sendMsg("/reg_ok");
+                                } else {
+                                    sendMsg("/reg_fail");
+                                }
+                            }
                         }
                     }
+
+                    socket.setSoTimeout(0);
 
                     //цикл работы
                     while (authenticated) {
@@ -78,9 +104,14 @@ public class ClientHandler {
                             server.broadcastMsg(this, str, false);
                         }
                     }
+                } catch (SocketTimeoutException e) {
+                    sendMsg("/end");
+                    e.printStackTrace();
+                    //SocketTimeOutException
                 } catch (IOException e) {
+                    e.printStackTrace();
 
-                } finally {
+            } finally {
                     server.unsubscribe(this);
                     System.out.println("Client disconnected");
                     try {
@@ -110,5 +141,9 @@ public class ClientHandler {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }
