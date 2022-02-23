@@ -12,13 +12,14 @@
             prefHeight="400.0" prefWidth="600.0">
 
     <VBox>
-        <Label text="login:"/>
+        <Label text="login:" alignment="CENTER"/>
         <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Login"/>
-        <Label text="password:"/>
+        <Label text="password:" alignment="CENTER"/>
         <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="password"/>
+        <Label text="nickname" alignment="CENTER"/>
         <TextField fx:id="nicknameField" promptText="Nickname"/>
         <TextArea fx:id="systemTextArea" editable="false"/>
-        <Button text="Auth" alignment="CENTER_RIGHT" onAction="#tryToReg"/>
+        <Button text="Auth" alignment="CENTER" onAction="#tryToReg"/>
     </VBox>
 
 </AnchorPane>

@@ -1,12 +1,11 @@
 package server;
 
-import constants.Command;
+import constants.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public class ClientHandler {
@@ -41,11 +40,11 @@ public class ClientHandler {
 
                         if (str.startsWith("/")) {
                             if (str.equals(Command.END)) {
-                                sendMsg("/end");
+                                sendMsg(Command.END);
                                 break;
                             }
 
-                            if (str.startsWith("/auth ")) {
+                            if (str.startsWith(Command.AUTH)) {
                                 String[] token = str.split(" ",3);
                                 if (token.length < 3) {
                                     continue;
@@ -55,7 +54,7 @@ public class ClientHandler {
                                 if (newNick != null) {
                                     if (!server.isLoginUsed(login)) {
                                         nickname = newNick;
-                                        sendMsg("/auth_OK " + nickname);
+                                        sendMsg(Command.AUTH_OK+" " + nickname);
                                         authenticated = true;
                                         server.subscribe(this);
                                         break;
@@ -67,15 +66,15 @@ public class ClientHandler {
                                 }
                             }
 
-                            if (str.startsWith("/reg")) {
+                            if (str.startsWith(Command.REG)) {
                                 String[] token = str.split(" ");
                                 if (token.length<4) {
                                     continue;
                                 }
                                 if (server.getAuthService().registration(token[1],token[2],token[3])){
-                                    sendMsg("/reg_ok");
+                                    sendMsg(Command.REG_OK);
                                 } else {
-                                    sendMsg("/reg_fail");
+                                    sendMsg(Command.REG_FAIL);
                                 }
                             }
                         }
@@ -87,17 +86,18 @@ public class ClientHandler {
                     while (authenticated) {
                         String str = in.readUTF();
 
-                        if (str.equals("/end")) {
-                            sendMsg("/end");
+                        if (str.equals(Command.END)) {
+                            sendMsg(Command.END);
                             break;
                         }
 
-                        if (str.startsWith("/w "))  {
+                        if (str.startsWith(Command.PRIVATE))  {
                             String[] token = str.split(" ",3);
                             if (token.length<3) continue;
 
                             String getter = token[1];
                             String privateMsg = token[2];
+
                             server.privateMsg(this, getter, privateMsg);
 
                         } else {
@@ -105,12 +105,10 @@ public class ClientHandler {
                         }
                     }
                 } catch (SocketTimeoutException e) {
-                    sendMsg("/end");
+                    sendMsg(Command.END);
                     e.printStackTrace();
-                    //SocketTimeOutException
                 } catch (IOException e) {
                     e.printStackTrace();
-
             } finally {
                     server.unsubscribe(this);
                     System.out.println("Client disconnected");
@@ -132,7 +130,6 @@ public class ClientHandler {
 
     public void sendMsg(String msg) {
         try {
-            //out.writeUTF("ECHO: "+msg);
             out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();

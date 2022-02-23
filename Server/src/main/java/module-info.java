@@ -1,2 +1,3 @@
 module Server {
+    requires MyAPI;
 }

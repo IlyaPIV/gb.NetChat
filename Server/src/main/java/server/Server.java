@@ -1,5 +1,7 @@
 package server;
 
+import constants.Command;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -61,7 +63,7 @@ public class Server {
     }
 
     public void broadcastClientList() {
-        StringBuilder sb = new StringBuilder("/clientlist");
+        StringBuilder sb = new StringBuilder(Command.CLIENT_LIST);
 
         for (ClientHandler ch:
              clients) {
@@ -85,7 +87,7 @@ public class Server {
             String messageToGetter = String.format("private from [%s]: %s",sender.getNickname(),msg);
             String messageToSender = String.format("private to [%s]: %s", getterNickname, msg);
             getter.sendMsg(messageToGetter);
-            sender.sendMsg(messageToSender);
+            if (!sender.getNickname().equals(getterNickname)) sender.sendMsg(messageToSender);
         }
     }
 

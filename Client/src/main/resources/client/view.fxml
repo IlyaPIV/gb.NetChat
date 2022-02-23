@@ -16,7 +16,7 @@
    <HBox fx:id="AuthPanel">
        <children>
            <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Login"/>
-           <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="password"/>
+           <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="password" onAction="#tryToAuth"/>
            <Button text="Authentication" alignment="CENTER_RIGHT" onAction="#tryToAuth"/>
            <Button text="Registration" alignment="CENTER_RIGHT" onAction="#tryToReg"/>
        </children>
@@ -31,7 +31,7 @@
     </HBox>
    <HBox fx:id="MsgPanel" visible="false" managed="false">
       <children>
-          <TextField fx:id="textField" onAction="#sendMessage" promptText="write your message here..." HBox.hgrow="ALWAYS" />
+          <TextField fx:id="textField" onAction="#sendMessage" promptText="write your message here..." HBox.hgrow="ALWAYS"/>
          <Button alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#sendMessage" text="Send message..." />
       </children>
    </HBox>

@@ -8,7 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Client" />
         <module name="Server" />
-        <module name="API" />
+        <module name="MyAPI" />
       </profile>
     </annotationProcessing>
   </component>

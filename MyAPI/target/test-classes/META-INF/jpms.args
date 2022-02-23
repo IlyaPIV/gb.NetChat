@@ -1,0 +1,4 @@
+--patch-module
+MyAPI=_
+--add-reads
+MyAPI=ALL-UNNAMED

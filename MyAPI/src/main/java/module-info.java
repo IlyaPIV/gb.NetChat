@@ -1,0 +1,3 @@
+module MyAPI{
+    exports constants;
+}

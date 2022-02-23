@@ -3,7 +3,7 @@ package client;
 
 
 
-import constants.Command;
+import constants.*;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -13,6 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -110,15 +112,15 @@ public class Controller implements Initializable {
                         String str = in.readUTF();
 
                         if (str.startsWith("/")) {
-                            if (str.equals("/end")) {
+                            if (str.equals(Command.END)) {
                                 break;
                             }
-                            if (str.startsWith("/auth_OK")){
+                            if (str.startsWith(Command.AUTH_OK)){
                                 nickname = str.split(" ")[1];
                                 setAuthenticated(true);
                                 break;
                             }
-                            if (str.equals("/reg_ok") || str.equals("/reg_fail")) {
+                            if (str.equals(Command.REG_OK) || str.equals(Command.REG_FAIL)) {
                                 regController.regResult(str);
                             }
                         } else {
@@ -131,11 +133,11 @@ public class Controller implements Initializable {
                         String str = in.readUTF();
 
                     if (str.startsWith("/")) {
-                        if (str.equals("/end")) {
+                        if (str.equals(Command.END)) {
                             break;
                         }
 
-                        if (str.startsWith("/clientlist")) {
+                        if (str.startsWith(Command.CLIENT_LIST)) {
                             String[] token = str.split(" ");
 
                             Platform.runLater(()->{
@@ -187,7 +189,7 @@ public class Controller implements Initializable {
             connect();
         }
 
-        String msg = String.format("/auth %s %s", loginField.getText().trim(), passField.getText().trim());
+        String msg = String.format("%s %s %s", Command.AUTH, loginField.getText().trim(), passField.getText().trim());
         passField.clear();
 
         try {
@@ -213,7 +215,8 @@ public class Controller implements Initializable {
     public void clientListMouseAction(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount()==2) {
             textField.clear();
-            textField.appendText("/w "+clientList.getSelectionModel().getSelectedItem());
+            textField.appendText("/w "+clientList.getSelectionModel().getSelectedItem()+" ");
+            textField.requestFocus();
         }
     }
 
@@ -240,6 +243,8 @@ public class Controller implements Initializable {
 
     }
 
+
+
     public void tryToReg(ActionEvent actionEvent) {
         if (regStage==null) {
             createRegStage();
@@ -249,7 +254,7 @@ public class Controller implements Initializable {
     }
 
     public void registration(String login, String password, String nickname){
-        String msg = String.format("/reg %s %s %s", login, password, nickname);
+        String msg = String.format("%s %s %s %s", Command.REG, login, password, nickname);
 
         if (socket == null || socket.isClosed()) {
             connect();
@@ -261,4 +266,5 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
     }
+
 }
