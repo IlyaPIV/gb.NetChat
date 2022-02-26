@@ -1,9 +1,12 @@
 package server;
 
+import constants.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
     private Server server;
@@ -13,6 +16,7 @@ public class ClientHandler {
 
     private boolean authenticated;
     private String nickname;
+    private String login;
 
     public ClientHandler(Server server, Socket socket) {
 
@@ -27,50 +31,85 @@ public class ClientHandler {
             new Thread(()->{
                 try {
 
+                    //ДЗ
+                    socket.setSoTimeout(120000);
+
                     //цикл аутентификации
                     while (true) {
                         String str = in.readUTF();
 
                         if (str.startsWith("/")) {
-                            if (str.equals("/end")) {
-                                sendMsg("/end");
+                            if (str.equals(Command.END)) {
+                                sendMsg(Command.END);
                                 break;
                             }
 
-                            if (str.startsWith("/auth ")) {
+                            if (str.startsWith(Command.AUTH)) {
                                 String[] token = str.split(" ",3);
                                 if (token.length < 3) {
                                     continue;
                                 }
                                 String newNick = server.getAuthService().getNicknameByLoginAndPassword(token[1],token[2]);
-
+                                login = token[1];
                                 if (newNick != null) {
-                                    nickname = newNick;
-                                    sendMsg("/auth_OK " + nickname);
-                                    authenticated = true;
-                                    server.subscribe(this);
-                                    break;
+                                    if (!server.isLoginUsed(login)) {
+                                        nickname = newNick;
+                                        sendMsg(Command.AUTH_OK+" " + nickname);
+                                        authenticated = true;
+                                        server.subscribe(this);
+                                        break;
+                                    } else {
+                                        sendMsg("Эта учётная запись уже используется.");
+                                    }
                                 } else {
                                     sendMsg("Логин / пароль не верны");
+                                }
+                            }
+
+                            if (str.startsWith(Command.REG)) {
+                                String[] token = str.split(" ");
+                                if (token.length<4) {
+                                    continue;
+                                }
+                                if (server.getAuthService().registration(token[1],token[2],token[3])){
+                                    sendMsg(Command.REG_OK);
+                                } else {
+                                    sendMsg(Command.REG_FAIL);
                                 }
                             }
                         }
                     }
 
+                    socket.setSoTimeout(0);
+
                     //цикл работы
                     while (authenticated) {
                         String str = in.readUTF();
 
-                        if (str.equals("/end")) {
-                            sendMsg("/end");
+                        if (str.equals(Command.END)) {
+                            sendMsg(Command.END);
                             break;
                         }
 
-                        server.broadcastMsg(this, str);
-                    }
-                } catch (IOException e) {
+                        if (str.startsWith(Command.PRIVATE))  {
+                            String[] token = str.split(" ",3);
+                            if (token.length<3) continue;
 
-                } finally {
+                            String getter = token[1];
+                            String privateMsg = token[2];
+
+                            server.privateMsg(this, getter, privateMsg);
+
+                        } else {
+                            server.broadcastMsg(this, str, false);
+                        }
+                    }
+                } catch (SocketTimeoutException e) {
+                    sendMsg(Command.END);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+            } finally {
                     server.unsubscribe(this);
                     System.out.println("Client disconnected");
                     try {
@@ -91,7 +130,6 @@ public class ClientHandler {
 
     public void sendMsg(String msg) {
         try {
-            //out.writeUTF("ECHO: "+msg);
             out.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,5 +138,9 @@ public class ClientHandler {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }

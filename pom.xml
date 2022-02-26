@@ -11,6 +11,7 @@
     <modules>
         <module>Client</module>
         <module>Server</module>
+        <module>MyAPI</module>
     </modules>
 
     <properties>
@@ -18,4 +19,19 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
