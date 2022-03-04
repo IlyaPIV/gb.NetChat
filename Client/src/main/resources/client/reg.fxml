@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="client.RegController"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="250.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.RegController">
 
-    <VBox>
-        <Label text="login:" alignment="CENTER"/>
-        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Login"/>
-        <Label text="password:" alignment="CENTER"/>
-        <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="password"/>
-        <Label text="nickname" alignment="CENTER"/>
-        <TextField fx:id="nicknameField" promptText="Nickname"/>
-        <TextArea fx:id="systemTextArea" editable="false"/>
-        <Button text="Auth" alignment="CENTER" onAction="#tryToReg"/>
+    <VBox prefHeight="250" prefWidth="250">
+        <Label alignment="CENTER" text="login:" />
+        <TextField fx:id="loginField" promptText="Login" HBox.hgrow="ALWAYS" />
+        <Label alignment="CENTER" text="password:" />
+        <PasswordField fx:id="passField" promptText="password" HBox.hgrow="ALWAYS" />
+        <Label alignment="CENTER" text="nickname" />
+        <TextField fx:id="nicknameField" promptText="Nickname" />
+        <TextArea fx:id="systemTextArea" prefHeight="100" editable="false" />
+        <Button alignment="CENTER" defaultButton="true" onAction="#tryToReg" prefHeight="25.0" prefWidth="300.0" text="Try to reg new user" textAlignment="CENTER" />
+
     </VBox>
 
 </AnchorPane>
