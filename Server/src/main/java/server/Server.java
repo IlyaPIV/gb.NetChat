@@ -15,18 +15,16 @@ public class Server {
     private  Socket clientSocket;
     private  final int PORT = 8189;
 
-//    private static DataInputStream in;
-//    private static DataOutputStream out;
-
     private List<ClientHandler> clients;
 
     private AuthService authService;
+    private SqliteAuthService sqlAuthService;
 
     public Server() {
 
         clients = new CopyOnWriteArrayList<>();
         authService = new SimpleAuthService();
-
+        sqlAuthService = new SqliteAuthService();
 
         try {
             serverSocket = new ServerSocket(PORT);
@@ -55,6 +53,8 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            sqlAuthService.disconnect();
         }
     }
 
@@ -128,7 +128,8 @@ public class Server {
     }
 
     public AuthService getAuthService(){
-        return authService;
+        //return authService;
+        return sqlAuthService;
     }
 
 

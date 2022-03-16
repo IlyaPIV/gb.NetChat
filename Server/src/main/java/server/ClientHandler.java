@@ -91,6 +91,28 @@ public class ClientHandler {
                             break;
                         }
 
+                        if (str.startsWith(Command.UPDATE_NICK)) {
+                            String[] token = str.split(" ", 2);
+                            if (server.getAuthService().updateNickname(login,token[1])) {
+                                sendMsg("Ник успешно изменён");
+                                nickname = token[1];
+                                sendMsg(Command.UPDATE_OK+" "+nickname);
+                                server.broadcastClientList();
+
+                            } else sendMsg("Ошибка изменения никнейма");
+
+                            continue;
+                        }
+
+                        if (str.startsWith(Command.UPDATE_PASS)) {
+                            String[] token = str.split(" ", 2);
+                            if (server.getAuthService().updateNickname(login,token[1])) {
+                                sendMsg("Пароль успешно изменён");
+                            } else sendMsg("Ошибка изменения пароля пользователя");
+
+                            continue;
+                        }
+
                         if (str.startsWith(Command.PRIVATE))  {
                             String[] token = str.split(" ",3);
                             if (token.length<3) continue;
@@ -110,6 +132,7 @@ public class ClientHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
             } finally {
+
                     server.unsubscribe(this);
                     System.out.println("Client disconnected");
                     try {

@@ -20,4 +20,22 @@ public interface AuthService {
      * false если логин или никнейм уже заняты, или регистрация не получилась
      */
     boolean registration(String login, String password, String nickname);
+
+    /**
+     * метод для обновления никнейма пользователя
+     * @param login
+     * @param nickname
+     * @return true при успешном изменении
+     * false если произошла ошибка
+     */
+    boolean updateNickname(String login, String nickname);
+
+    /**
+     * метод для обновления пароля пользователя
+     * @param login
+     * @param password
+     * @return true при успешном изменении
+     * false если произошла ошибка
+     */
+    boolean updatePassword(String login, String password);
 }
