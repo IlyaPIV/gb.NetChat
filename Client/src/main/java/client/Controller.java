@@ -13,20 +13,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 
@@ -60,6 +58,9 @@ public class Controller implements Initializable {
     private boolean authenticated;
     private String nickname;
 
+    private String logFileName;
+    private FileWriter fileWriter;
+
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
@@ -71,11 +72,22 @@ public class Controller implements Initializable {
         clientList.setVisible(authenticated);
         clientList.setManaged(authenticated);
 
-        if (!authenticated){
-            nickname="";
+        try {
+            if (authenticated) {
+                loadChatHistory();
+                fileWriter = new FileWriter(logFileName,true);
+            } else if (fileWriter!=null)
+                fileWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        textArea.clear();
+        if (!authenticated){
+            nickname="";
+            textArea.clear();
+        }
+
         setTitle(nickname);
     }
 
@@ -155,6 +167,7 @@ public class Controller implements Initializable {
                         }
                     } else {
                             textArea.appendText(str + "\n");
+                            writeToChatHistory(str+"\n");
                         }
                     }
                 } catch (IOException e) {
@@ -169,8 +182,6 @@ public class Controller implements Initializable {
                 }
             }).start();
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -195,6 +206,7 @@ public class Controller implements Initializable {
         }
 
         String msg = String.format("%s %s %s", Command.AUTH, loginField.getText().trim(), passField.getText().trim());
+        logFileName = String.format("history_%s.txt",loginField.getText().trim());
         passField.clear();
 
         try {
@@ -211,9 +223,7 @@ public class Controller implements Initializable {
         } else {
             title = String.format("[%s], Let's chat!!!", nickname);
         }
-        Platform.runLater(()->{
-            stage.setTitle(title);
-        } );
+        Platform.runLater(()-> stage.setTitle(title));
     }
 
     @FXML
@@ -272,4 +282,35 @@ public class Controller implements Initializable {
         }
     }
 
+
+    public void loadChatHistory(){
+        try {
+            File logFile = new File(logFileName);
+            if (logFile.exists()) {
+                BufferedReader br = Files.newBufferedReader(logFile.toPath());
+                ArrayList<String> logs = new ArrayList<>();
+                while (br.ready()) {
+                    logs.add(br.readLine());
+                }
+                int maxIndex = logs.size();
+                int minIndex = logs.size()>100 ? maxIndex-100 : 0;
+                for (int i = minIndex; i < maxIndex; i++) {
+                    String logString = logs.get(i);
+                    if (!logString.isEmpty()) textArea.appendText(logString+"\n");
+                }
+                br.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeToChatHistory(String message){
+        try {
+            fileWriter.write(message);
+            fileWriter.write("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

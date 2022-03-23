@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.Buffer;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -59,7 +60,7 @@ public class Server {
     }
 
     public void broadcastMsg(ClientHandler sender, String msg, boolean system){
-        String message = system? msg : String.format("[%s]: %s",sender.getNickname(),msg);
+        String message = system? msg : String.format("%s > [%s]: %s",serverTime(), sender.getNickname(),msg);
         for (ClientHandler client:
              clients) {
             client.sendMsg(message);
@@ -88,8 +89,8 @@ public class Server {
             String message = String.format("failed to send private message: user [%s] is not online",getterNickname);
             sender.sendMsg(message);
         } else {
-            String messageToGetter = String.format("private from [%s]: %s",sender.getNickname(),msg);
-            String messageToSender = String.format("private to [%s]: %s", getterNickname, msg);
+            String messageToGetter = String.format("%s > private from [%s]: %s",serverTime(),sender.getNickname(),msg);
+            String messageToSender = String.format("%s > private to [%s]: %s", serverTime(), getterNickname, msg);
             getter.sendMsg(messageToGetter);
             if (!sender.getNickname().equals(getterNickname)) sender.sendMsg(messageToSender);
         }
@@ -114,7 +115,7 @@ public class Server {
     }
 
     public void subscribe(ClientHandler ch) {
-        String message = String.format(">>> user [%s] now is online...",ch.getNickname());
+        String message = String.format("%s !!! user [%s] now is online...",serverTime(),ch.getNickname());
         broadcastMsg(ch,message, true);
         clients.add(ch);
         broadcastClientList();
@@ -122,7 +123,7 @@ public class Server {
 
     public void unsubscribe(ClientHandler ch) {
         clients.remove(ch);
-        String message = String.format(">>> user [%s] left our chat...",ch.getNickname());
+        String message = String.format("%s !!! user [%s] left our chat...",serverTime(), ch.getNickname());
         broadcastMsg(ch,message, true);
         broadcastClientList();
     }
@@ -132,5 +133,10 @@ public class Server {
         return sqlAuthService;
     }
 
+    private String serverTime(){
+        Date currentTime = new Date();
+        String time = String.format("[%2d:%2d:%2d]",currentTime.getHours(),currentTime.getMinutes(),currentTime.getSeconds());
+        return time;
+    }
 
 }
