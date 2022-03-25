@@ -6,9 +6,13 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.Buffer;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
 
@@ -21,11 +25,17 @@ public class Server {
     private AuthService authService;
     private SqliteAuthService sqlAuthService;
 
+    private ExecutorService executorService;
+
     public Server() {
 
         clients = new CopyOnWriteArrayList<>();
         authService = new SimpleAuthService();
         sqlAuthService = new SqliteAuthService();
+
+        //HomeWork4+++
+        executorService = Executors.newCachedThreadPool();
+        //HomeWork4---
 
         try {
             serverSocket = new ServerSocket(PORT);
@@ -135,8 +145,14 @@ public class Server {
 
     private String serverTime(){
         Date currentTime = new Date();
-        String time = String.format("[%2d:%2d:%2d]",currentTime.getHours(),currentTime.getMinutes(),currentTime.getSeconds());
-        return time;
+
+        SimpleDateFormat formatForDateNow = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
+        return String.format("[%s]",formatForDateNow.format(currentTime));
+
+    }
+
+    public ExecutorService getExecutorService(){
+        return executorService;
     }
 
 }
