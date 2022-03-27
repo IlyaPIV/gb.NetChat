@@ -28,10 +28,11 @@ public class ClientHandler {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            new Thread(()->{
+            //HomeWork4+++
+
+            server.getExecutorService().execute(()->{
                 try {
 
-                    //ДЗ
                     socket.setSoTimeout(120000);
 
                     //цикл аутентификации
@@ -131,7 +132,7 @@ public class ClientHandler {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-            } finally {
+                } finally {
 
                     server.unsubscribe(this);
                     System.out.println("Client disconnected");
@@ -141,9 +142,8 @@ public class ClientHandler {
                         e.printStackTrace();
                     }
                 }
-            }).start();
-
-
+            });
+            //HomeWork4---
 
         } catch (IOException e) {
             e.printStackTrace();
