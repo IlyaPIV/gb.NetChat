@@ -1,0 +1,30 @@
+апр. 02, 2022 12:23:05 PM server.Server <init>
+INFO: Server started
+апр. 02, 2022 12:24:21 PM server.Server <init>
+INFO: Server started
+апр. 02, 2022 12:31:03 PM server.Server <init>
+INFO: Server started
+апр. 02, 2022 12:31:21 PM server.Server <init>
+INFO: Client connected
+апр. 02, 2022 12:31:28 PM server.ClientHandler lambda$new$0
+INFO: Client moloch disconnected
+апр. 02, 2022 12:39:02 PM server.Server <init>
+INFO: Server started
+апр. 02, 2022 12:39:17 PM server.Server <init>
+INFO: Client connected
+апр. 02, 2022 12:39:17 PM server.ClientHandler lambda$new$0
+FINE: asdasd - ошибка входа: логин или пароль не верны.
+апр. 02, 2022 12:39:28 PM server.ClientHandler lambda$new$0
+FINE: moloch - успешная авторизация пользователя
+апр. 02, 2022 12:39:33 PM server.ClientHandler lambda$new$0
+INFO: Client moloch disconnected
+апр. 02, 2022 12:41:45 PM server.Server <init>
+INFO: Server started
+апр. 02, 2022 12:42:04 PM server.Server <init>
+INFO: Client connected
+апр. 02, 2022 12:42:04 PM server.ClientHandler lambda$new$0
+FINE: Moloch - ошибка входа: логин или пароль не верны.
+апр. 02, 2022 12:44:04 PM server.ClientHandler lambda$new$0
+WARNING: Timeout ожидания подключения пользователя
+апр. 02, 2022 12:44:04 PM server.ClientHandler lambda$new$0
+INFO: Client Moloch disconnected
