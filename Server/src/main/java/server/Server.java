@@ -2,6 +2,7 @@ package server;
 
 import constants.Command;
 
+import javax.print.attribute.standard.Severity;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,6 +14,7 @@ import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.*;
 
 public class Server {
 
@@ -27,6 +29,8 @@ public class Server {
 
     private ExecutorService executorService;
 
+    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+
     public Server() {
 
         clients = new CopyOnWriteArrayList<>();
@@ -37,13 +41,30 @@ public class Server {
         executorService = Executors.newCachedThreadPool();
         //HomeWork4---
 
+        //HomeWork6+++
         try {
+
+            LogManager logManager = LogManager.getLogManager();
+            logManager.readConfiguration(new FileInputStream("Server/logging.properties"));
+
+//            Handler fileHandler = new FileHandler("log_server_%d.txt", 10*1024, 10,true);
+//            fileHandler.setFormatter(new SimpleFormatter());
+//            LOGGER.addHandler(fileHandler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //HomeWork6---
+
+        try {
+
             serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started");
+            LOGGER.log(Level.INFO,"Server started");
+            //System.out.println("Server started");
 
             while (true) {
                 clientSocket = serverSocket.accept();
-                System.out.println("Client connected");
+                LOGGER.log(Level.INFO,"Client connected");
+                //System.out.println("Client connected");
 
                 new ClientHandler(this,clientSocket);
             }
@@ -51,18 +72,21 @@ public class Server {
 
         } catch (IOException e) {
             e.printStackTrace();
+            LOGGER.log(Level.SEVERE,e.getMessage());
         } finally {
 
             try {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                LOGGER.log(Level.SEVERE,e.getMessage());
             }
 
             try {
                 serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                LOGGER.log(Level.SEVERE,e.getMessage());
             }
 
             sqlAuthService.disconnect();
@@ -153,6 +177,11 @@ public class Server {
 
     public ExecutorService getExecutorService(){
         return executorService;
+    }
+
+    public Logger getLogger()
+    {
+        return LOGGER;
     }
 
 }

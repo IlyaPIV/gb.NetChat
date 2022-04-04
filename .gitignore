@@ -1,3 +1,4 @@
 # Project exclude paths
 /Client/target/
 /Server/target/
+/MyAPI/target/

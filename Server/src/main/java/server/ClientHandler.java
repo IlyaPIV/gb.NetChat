@@ -7,6 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientHandler {
     private Server server;
@@ -17,6 +19,7 @@ public class ClientHandler {
     private boolean authenticated;
     private String nickname;
     private String login;
+    private Logger serverLogger;
 
     public ClientHandler(Server server, Socket socket) {
 
@@ -28,7 +31,8 @@ public class ClientHandler {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            //HomeWork4+++
+            serverLogger = server.getLogger();
+
 
             server.getExecutorService().execute(()->{
                 try {
@@ -58,12 +62,15 @@ public class ClientHandler {
                                         sendMsg(Command.AUTH_OK+" " + nickname);
                                         authenticated = true;
                                         server.subscribe(this);
+                                        serverLogger.log(Level.FINE, login + " - успешная авторизация пользователя");
                                         break;
                                     } else {
                                         sendMsg("Эта учётная запись уже используется.");
+                                        serverLogger.log(Level.FINE, login + " - учетная запись уже используется. Вход не выполнен");
                                     }
                                 } else {
                                     sendMsg("Логин / пароль не верны");
+                                    serverLogger.log(Level.FINE, login + " - ошибка входа: логин или пароль не верны.");
                                 }
                             }
 
@@ -96,11 +103,15 @@ public class ClientHandler {
                             String[] token = str.split(" ", 2);
                             if (server.getAuthService().updateNickname(login,token[1])) {
                                 sendMsg("Ник успешно изменён");
+                                serverLogger.log(Level.FINE, login + " - никнейм успешно изменён");
                                 nickname = token[1];
                                 sendMsg(Command.UPDATE_OK+" "+nickname);
                                 server.broadcastClientList();
 
-                            } else sendMsg("Ошибка изменения никнейма");
+                            } else {
+                                sendMsg("Ошибка изменения никнейма");
+                                serverLogger.log(Level.CONFIG, login + " - ошибка изменения никнейма");
+                            }
 
                             continue;
                         }
@@ -108,9 +119,12 @@ public class ClientHandler {
                         if (str.startsWith(Command.UPDATE_PASS)) {
                             String[] token = str.split(" ", 2);
                             if (server.getAuthService().updateNickname(login,token[1])) {
-                                sendMsg("Пароль успешно изменён");
-                            } else sendMsg("Ошибка изменения пароля пользователя");
-
+                                serverLogger.log(Level.FINE,login+" - успешно изменил пароль");
+                                //sendMsg("Пароль успешно изменён");
+                            } else {
+                                sendMsg("Ошибка изменения пароля пользователя");
+                                serverLogger.log(Level.CONFIG, login + " - ошибка изменения пароля пользователя");
+                            }
                             continue;
                         }
 
@@ -129,13 +143,15 @@ public class ClientHandler {
                     }
                 } catch (SocketTimeoutException e) {
                     sendMsg(Command.END);
+                    serverLogger.log(Level.WARNING, "Timeout ожидания подключения пользователя");
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
 
                     server.unsubscribe(this);
-                    System.out.println("Client disconnected");
+                    serverLogger.log(Level.INFO,"Client "+login+" disconnected");
+                    //System.out.println("Client disconnected");
                     try {
                         socket.close();
                     } catch (IOException e) {
@@ -143,7 +159,7 @@ public class ClientHandler {
                     }
                 }
             });
-            //HomeWork4---
+
 
         } catch (IOException e) {
             e.printStackTrace();
